@@ -1,0 +1,262 @@
+--// Load Libraries
+if not getgenv().Library then
+    getgenv().Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/Gui/main/Gui%20Lib%20%5BLibrary%5D"))()
+end
+local Library = getgenv().Library
+
+if not getgenv().ThemeManager then
+    getgenv().ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/Gui/main/Gui%20Lib%20%5BThemeManager%5D"))()
+end
+local ThemeManager = getgenv().ThemeManager
+
+if not getgenv().SaveManager then
+    getgenv().SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/KINGHUB01/Gui/main/Gui%20Lib%20%5BSaveManager%5D"))()
+end
+local SaveManager = getgenv().SaveManager
+
+
+--// Services
+local RunService = game:GetService("RunService")
+local LocalPlayer = game.Players.LocalPlayer
+
+--// Config Table
+local Config = {
+    TheBronx = {
+        PlayerModifications = {
+            InfiniteStamina = false,
+            InfiniteHunger  = false,
+            InfiniteSleep   = false,
+        }
+    }
+}
+
+-- Change this check to match the actual Bronx PlaceId(s)
+local Game_Name = (game.PlaceId == 123456789) and "The Bronx" or ""
+
+
+--// Create Window
+local Window = Library:CreateWindow({
+    Title = 'My Script Hub',
+    Center = true,
+    AutoShow = true,
+    TabPadding = 8,
+    MenuFadeTime = 0.2
+})
+
+
+--// Define Tabs
+local Tabs = {
+    Player   = Window:AddTab('Player'),
+    Main     = Window:AddTab('Main'),
+    Autofarm = Window:AddTab('Autofarm'),
+    Combat   = Window:AddTab('Combat'),
+    Visuals  = Window:AddTab('Visuals'),
+    Settings = Window:AddTab('Settings'),
+}
+
+
+--// Player Tab
+local PlayerGroup = Tabs.Player:AddLeftGroupbox('Player Options')
+
+PlayerGroup:AddToggle('GodMode', {
+    Text = 'God Mode',
+    Default = false,
+    Callback = function(Value)
+        print('God Mode:', Value)
+    end
+})
+
+PlayerGroup:AddSlider('WalkSpeed', {
+    Text = 'Walk Speed',
+    Default = 16,
+    Min = 16,
+    Max = 100,
+    Rounding = 0,
+    Callback = function(Value)
+        if LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.WalkSpeed = Value
+        end
+    end
+})
+
+PlayerGroup:AddSlider('JumpPower', {
+    Text = 'Jump Power',
+    Default = 50,
+    Min = 50,
+    Max = 200,
+    Rounding = 0,
+    Callback = function(Value)
+        if LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.JumpPower = Value
+        end
+    end
+})
+
+-- New Toggles for Bronx Mods
+PlayerGroup:AddToggle('InfiniteStamina', {
+    Text = 'Infinite Stamina',
+    Default = false,
+    Callback = function(Value)
+        Config.TheBronx.PlayerModifications.InfiniteStamina = Value
+    end
+})
+
+PlayerGroup:AddToggle('InfiniteHunger', {
+    Text = 'Infinite Hunger',
+    Default = false,
+    Callback = function(Value)
+        Config.TheBronx.PlayerModifications.InfiniteHunger = Value
+    end
+})
+
+PlayerGroup:AddToggle('InfiniteSleep', {
+    Text = 'Infinite Sleep',
+    Default = false,
+    Callback = function(Value)
+        Config.TheBronx.PlayerModifications.InfiniteSleep = Value
+    end
+})
+
+
+--// Main Tab
+local MainGroup = Tabs.Main:AddLeftGroupbox('Main Features')
+
+MainGroup:AddButton({
+    Text = 'Example Button',
+    Func = function() print('Main button clicked!') end,
+    Tooltip = 'This is an example button'
+})
+
+
+--// Autofarm Tab
+local FarmGroup = Tabs.Autofarm:AddLeftGroupbox('Autofarm Options')
+
+FarmGroup:AddToggle('AutoFarmToggle', {
+    Text = 'Enable Autofarm',
+    Default = false,
+    Callback = function(Value)
+        print('Autofarm toggled:', Value)
+    end
+})
+
+FarmGroup:AddSlider('FarmSpeed', {
+    Text = 'Farm Speed',
+    Default = 1,
+    Min = 1,
+    Max = 10,
+    Rounding = 0,
+    Callback = function(Value)
+        print('Farm Speed:', Value)
+    end
+})
+
+
+--// Combat Tab
+local CombatGroup = Tabs.Combat:AddLeftGroupbox('Combat Options')
+
+CombatGroup:AddToggle('Aimbot', {
+    Text = 'Enable Aimbot',
+    Default = false,
+    Callback = function(Value)
+        print('Aimbot:', Value)
+    end
+})
+
+CombatGroup:AddToggle('ESP', {
+    Text = 'Enable ESP',
+    Default = false,
+    Callback = function(Value)
+        print('ESP:', Value)
+    end
+})
+
+
+--// Visuals Tab
+local VisualsGroup = Tabs.Visuals:AddLeftGroupbox('Visuals')
+
+VisualsGroup:AddColorPicker('ESPColor', {
+    Default = Color3.new(1, 0, 0),
+    Title = 'ESP Color',
+    Callback = function(Value)
+        print('ESP Color:', Value)
+    end
+})
+
+VisualsGroup:AddToggle('Fullbright', {
+    Text = 'Enable Fullbright',
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            game.Lighting.Brightness = 2
+            game.Lighting.ClockTime = 14
+            game.Lighting.FogEnd = 100000
+        else
+            game.Lighting.Brightness = 1
+            game.Lighting.ClockTime = 12
+            game.Lighting.FogEnd = 1000
+        end
+    end
+})
+
+
+--// Settings Tab (UI, Theme, Save)
+local MenuGroup = Tabs.Settings:AddLeftGroupbox('Menu')
+
+MenuGroup:AddButton('Unload', function() Library:Unload() end)
+MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+-- Save/Theme integration
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
+
+ThemeManager:SetFolder('MyScriptHub')
+SaveManager:SetFolder('MyScriptHub/specific-game')
+
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+
+-- Uncomment if you want autoload configs
+-- SaveManager:LoadAutoloadConfig()
+
+
+--// Game Specific Logic for "The Bronx"
+if Game_Name == "The Bronx" then
+    RunService.RenderStepped:Connect(function()
+        -- Infinite Stamina
+        if Config.TheBronx.PlayerModifications.InfiniteStamina then
+            local runGui = LocalPlayer.PlayerGui:FindFirstChild("Run")
+            if runGui then
+                local bar = runGui:FindFirstChild("StaminaBar", true)
+                if bar and bar:FindFirstChild("Bar") then
+                    bar.Bar.Size = UDim2.new(1, 0, bar.Bar.Size.Y.Scale, 0) -- force full
+                end
+            end
+        end
+
+        -- Infinite Hunger
+        if Config.TheBronx.PlayerModifications.InfiniteHunger then
+            local hungerGui = LocalPlayer.PlayerGui:FindFirstChild("Hunger")
+            if hungerGui then
+                local bar = hungerGui:FindFirstChild("HungerBar", true)
+                if bar and bar:FindFirstChild("Bar") then
+                    bar.Bar.Size = UDim2.new(1, 0, bar.Bar.Size.Y.Scale, 0)
+                end
+            end
+        end
+
+        -- Infinite Sleep
+        if Config.TheBronx.PlayerModifications.InfiniteSleep then
+            local sleepGui = LocalPlayer.PlayerGui:FindFirstChild("SleepGui")
+            if sleepGui then
+                local bar = sleepGui:FindFirstChild("SleepBar", true)
+                if bar and bar:FindFirstChild("Bar") then
+                    bar.Bar.Size = UDim2.new(1, 0, bar.Bar.Size.Y.Scale, 0)
+                end
+            end
+        end
+    end)
+end
